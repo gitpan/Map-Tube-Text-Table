@@ -22,17 +22,21 @@ meta-spec:
 name: Map-Tube-Text-Table
 no_index:
   directory:
+    - examples
     - inc
     - t
 requires:
+  Class::Utils: 0.06
+  Error::Pure: 0.21
   List::Util: 0
-  Map::Tube: '2.44'
-  Moo: 0
-  namespace::clean: 0
+  Readonly: 0
+  Scalar::Util: 0
+  Text::UnicodeBox: 0
+  Text::UnicodeBox::Control: 0
   perl: 5.8.0
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Map-Tube-Text-Table
   homepage: https://github.com/tupinek/Map-Tube-Text-Table
   license: http://opensource.org/licenses/artistic-license-2.0.php
   repository: git://github.com/tupinek/Map-Tube-Text-Table
-version: '0.01'
+version: '0.02'
