@@ -15,9 +15,10 @@ use Text::UnicodeBox::Control qw(:all);
 Readonly::Array our @EXPORT_OK => qw(table);
 Readonly::Scalar our $EMPTY_STR => q{};
 Readonly::Scalar our $SPACE => q{ };
+Readonly::Scalar our $SPACE_ON_END_COUNT => 1;
 
 # Version.
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 # Print table.
 sub table {
@@ -31,19 +32,21 @@ sub table {
 	my $t = Text::UnicodeBox->new;
 
 	# Table title.
+	my $pipes_in_count = @{$data_len_ar} * 2 - 2;
 	$t->add_line(
 		BOX_START('bottom' => 'light', 'top' => 'light'),
-		# XXX Co to je za vypocet?
-		_column_left($title, sum(@{$data_len_ar})
-			+ @{$data_len_ar} * 2 - 2),
+		_column_left($title, sum(map { $_ + $SPACE_ON_END_COUNT }
+			@{$data_len_ar}) + $pipes_in_count),
 		BOX_END(),
 	);
 
 	# Legend.
-	$t->add_line(
-		BOX_START('bottom' => 'light', 'top' => 'light'),
-		_columns($header_ar, $data_len_ar),
-	);
+	if (defined $header_ar) {
+		$t->add_line(
+			BOX_START('bottom' => 'light', 'top' => 'light'),
+			_columns($header_ar, $data_len_ar),
+		);
+	}
 
 	# Data.
 	while (my $row_ar = shift @{$data_ar}) {
@@ -72,7 +75,8 @@ sub _columns {
 	my @ret;
 	my $i = 0;
 	foreach my $item (@{$data_ar}) {
-		push @ret, _column_left($item, $data_len_ar->[$i++]);
+		push @ret, _column_left($item, $data_len_ar->[$i++]
+			+ $SPACE_ON_END_COUNT);
 		if (@{$data_ar} > $i) {
 			push @ret, BOX_RULE;
 		} else {
@@ -130,14 +134,14 @@ Map::Tube::Text::Table::Utils - Utilities for Map::Tube::Text::Table.
  print encode_utf8($table);
 
  # Output:
- # ┌───────────┐
- # │ Title     │
- # ├──┬───┬────┤
- # │ A│ BB│ CCC│
- # ├──┼───┼────┤
- # │ E│ A │ A  │
- # │ A│ Ga│ Acv│
- # └──┴───┴────┘
+ # ┌──────────────┐
+ # │ Title        │
+ # ├───┬────┬─────┤
+ # │ A │ BB │ CCC │
+ # ├───┼────┼─────┤
+ # │ E │ A  │ A   │
+ # │ A │ Ga │ Acv │
+ # └───┴────┴─────┘
 
 =head1 DEPENDENCIES
 
@@ -150,7 +154,8 @@ L<Text::UnicodeBox::Control>.
 =head1 SEE ALSO
 
 L<Map::Tube>,
-L<Map::Tube::Text::Table>.
+L<Map::Tube::Text::Table>,
+L<Task::Map::Tube>.
 
 =head1 REPOSITORY
 
@@ -164,12 +169,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2014 Michal Špaček
+ © 2014-2015 Michal Špaček
  Artistic License
  BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

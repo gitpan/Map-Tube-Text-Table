@@ -15,10 +15,11 @@ use Scalar::Util qw(blessed);
 Readonly::Scalar our $CONNECTED_TO => q{Connected to};
 Readonly::Scalar our $JUNCTIONS => q{Junctions};
 Readonly::Scalar our $LINE => q{Line};
+Readonly::Scalar our $LINES => q{Lines};
 Readonly::Scalar our $STATION => q{Station};
 
 # Version.
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 # Constructor.
 sub new {
@@ -77,7 +78,6 @@ sub junctions {
 			}
 		}
 	}
-	map { $_++ } @data_len;
 
 	# Print and return table.
 	return table($JUNCTIONS, \@data_len, \@title, \@data);
@@ -112,10 +112,24 @@ sub line {
 			}
 		}
 	}
-	map { $_++ } @data_len;
 
 	# Print and return table.
 	return table($LINE." '$line'", \@data_len, \@title, \@data);
+}
+
+# Get lines.
+sub lines {
+	my $self = shift;
+	my $lines_ar = $self->{'tube'}->get_lines;
+	my $length = 0;
+	my @data;
+	foreach my $line (sort @{$lines_ar}) {
+		push @data, [$line];
+		if (length $line > $length) {
+			$length = length $line;
+		}
+	}
+	return table($LINES, [$length], undef, \@data);
 }
 
 # Print all.
@@ -144,6 +158,7 @@ Map::Tube::Text::Table - Table output for Map::Tube.
  my $obj = Map::Tube::Text::Table->new(%params);
  my $text = $obj->junctions;
  my $text = $obj->line($line);
+ my $text = $obj->lines;
  my $text = $obj->print;
 
 =head1 METHODS
@@ -172,6 +187,11 @@ Map::Tube::Text::Table - Table output for Map::Tube.
 =item C<line($line)>
 
  Print line.
+ Returns string with unicode text table.
+
+=item C<lines()>
+
+ Print sorted lines.
  Returns string with unicode text table.
 
 =item C<print()>
@@ -291,7 +311,8 @@ L<Scalar::Util>.
 =head1 SEE ALSO
 
 L<Map::Tube>,
-L<Map::Tube::GraphViz>.
+L<Map::Tube::GraphViz>,
+L<Task::Map::Tube>.
 
 =head1 REPOSITORY
 
@@ -305,12 +326,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2014 Michal Špaček
+ © 2014-2015 Michal Špaček
  Artistic License
  BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut
